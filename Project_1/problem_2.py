@@ -23,11 +23,11 @@ def print_results(test_sam, test_miss, test_acc, combined_sam, combined_miss, co
 
 def perceptron(x_trn_std, x_tst_std, y_trn, y_tst, iterations):
     # create the classifier
-    ppn = Perceptron(max_iter=iterations, tol=1e-3, eta0=0.001,
+    prcptrn = Perceptron(max_iter=iterations, tol=1e-3, eta0=0.001,
                      fit_intercept=True, random_state=0, verbose=True)
-    ppn.fit(x_trn_std, y_trn)                   # do the training
+    prcptrn.fit(x_trn_std, y_trn)                   # do the training
 
-    y_pred = ppn.predict(x_tst_std)             # now try with the test data
+    y_pred = prcptrn.predict(x_tst_std)             # now try with the test data
     test_acc = accuracy_score(y_tst, y_pred)
 
     # combine the train and test data
@@ -35,7 +35,7 @@ def perceptron(x_trn_std, x_tst_std, y_trn, y_tst, iterations):
     y_combined = np.hstack((y_trn, y_tst))
 
     # we did the stack so we can see how the combination of test and train data did
-    y_combined_pred = ppn.predict(X_combined_std)
+    y_combined_pred = prcptrn.predict(X_combined_std)
     combined_samples = (y_combined != y_combined_pred).sum()
     combined_acc = accuracy_score(y_combined, y_combined_pred)
 
