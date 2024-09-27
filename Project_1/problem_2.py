@@ -15,8 +15,15 @@ from sklearn.model_selection import train_test_split
 FEATURES_END = 13
 FEATURES_START = 0
 TREE_DEPTH = 5
-PRCPTRN_MAX_ITERATIONS = 7 
+PRCPTRN_MAX_ITERATIONS = 7
+LR_C_VAL = .25
+SVM_C_VAL = .25
+RF_TREES = 5 
+KNN_NEIGHBORS = 5 
 
+############################################
+# Code for print method to keep uniform printing format for all methods
+##########################################
 def print_results(test_sam, test_miss, test_acc, combined_sam, combined_miss, combined_acc):
     print('Number in test: ', test_sam)
     print('Misclassified samples: %d' % test_miss)
@@ -25,13 +32,16 @@ def print_results(test_sam, test_miss, test_acc, combined_sam, combined_miss, co
     print('Misclassified combined samples: %d' % combined_miss)
     print('Combined Accuracy: %.2f' % combined_acc)
 
+###############################################################
+#Code for Perceptron
+##############################################################@
 def perceptron(x_trn_std, x_tst_std, y_trn, y_tst, iterations):
     # create the classifier
     prcptrn = Perceptron(max_iter=iterations, tol=1e-3, eta0=0.001,
                      fit_intercept=True, random_state=0, verbose=True)
-    prcptrn.fit(x_trn_std, y_trn)                   # do the training
+    prcptrn.fit(x_trn_std, y_trn)                   # training the model
 
-    y_pred = prcptrn.predict(x_tst_std)             # now try with the test data
+    y_pred = prcptrn.predict(x_tst_std)             # try to predict with the test data
     test_acc = accuracy_score(y_tst, y_pred)
 
     # combine the train and test data
@@ -47,13 +57,16 @@ def perceptron(x_trn_std, x_tst_std, y_trn, y_tst, iterations):
     print_results(len(y_tst), (y_tst != y_pred).sum(), test_acc, 
                   len(y_combined), combined_samples, combined_acc)
 
+###############################################################
+#Code for Logistic Regression
+##############################################################@
 def logistic_regression(x_trn_std, x_tst_std, y_trn, y_tst, c_val):
     # create the classifier
     lr = LogisticRegression(C=c_val, solver='liblinear',
                             multi_class='ovr', random_state=0)
-    lr.fit(x_trn_std, y_trn)                    # do the training
+    lr.fit(x_trn_std, y_trn)                    # training the model
 
-    y_pred = lr.predict(x_tst_std)              # now try with the test data
+    y_pred = lr.predict(x_tst_std)              # try to predict with the test data
     test_acc = accuracy_score(y_tst, y_pred)
 
     # combine the train and test data
@@ -69,13 +82,15 @@ def logistic_regression(x_trn_std, x_tst_std, y_trn, y_tst, c_val):
     print_results(len(y_tst), (y_tst != y_pred).sum(
     ), test_acc, len(y_combined), combined_samples, combined_acc)
 
-
+###############################################################
+#Code for Support Vector Machine
+##############################################################@
 def support_vector_machine(x_trn_std, x_tst_std, y_trn, y_tst, c_val):
     # create the classifier
     svm = SVC(kernel='linear', C=c_val, random_state=0)
-    svm.fit(x_trn_std, y_trn)                   # do the training
+    svm.fit(x_trn_std, y_trn)                   # training the model
 
-    y_pred = svm.predict(x_tst_std)             # now try with the test data
+    y_pred = svm.predict(x_tst_std)             # try to predict with the test data
     test_acc = accuracy_score(y_tst, y_pred)
 
     # combine the train and test data
@@ -91,12 +106,15 @@ def support_vector_machine(x_trn_std, x_tst_std, y_trn, y_tst, c_val):
     print_results(len(y_tst), (y_tst != y_pred).sum(
     ), test_acc, len(y_combined), combined_samples, combined_acc)
 
+###############################################################
+#Code for Decision Tree
+##############################################################@
 def decision_tree(x_trn, x_tst, y_trn, y_tst, depth, cols):
     # create the classifier
     tree = DecisionTreeClassifier(criterion='entropy', max_depth=depth, random_state=0)
-    tree.fit(x_trn, y_trn)                      # do the training
+    tree.fit(x_trn, y_trn)                      # training the model
 
-    y_pred = tree.predict(x_tst)                # now try with test data
+    y_pred = tree.predict(x_tst)                # try to predict with the test data
     test_acc = accuracy_score(y_tst, y_pred)
 
     # combine the train and test data
@@ -113,13 +131,16 @@ def decision_tree(x_trn, x_tst, y_trn, y_tst, depth, cols):
                   len(y_combined), combined_samples, combined_acc)
     export_graphviz(tree, out_file='tree.dot', feature_names=cols)
 
+###############################################################
+#Code for Random Forest
+##############################################################@
 def random_forest(x_trn, x_tst, y_trn, y_tst, trees):
     # create the classifier
     forest = RandomForestClassifier(
         criterion='entropy', n_estimators=trees, random_state=1, n_jobs=4)
-    forest.fit(x_trn, y_trn)                    # do the training
+    forest.fit(x_trn, y_trn)                    # training the model
 
-    y_pred = forest.predict(x_tst)              # try with the test data
+    y_pred = forest.predict(x_tst)              # try to predict with the test data
     test_acc = accuracy_score(y_tst, y_pred)
 
     # combine the train and test data
@@ -135,12 +156,14 @@ def random_forest(x_trn, x_tst, y_trn, y_tst, trees):
     print_results(len(y_tst), (y_tst != y_pred).sum(
     ), test_acc, len(y_combined), combined_samples, combined_acc)
 
+###############################################################
+#Code for K-nearest neighbors
+##############################################################@
 def k_nearest(x_trn_std, x_tst_std, y_trn, y_tst, neighs):
-    # create the classifier
-    knn = KNeighborsClassifier(n_neighbors=neighs, p=2, metric='minkowski')
-    knn.fit(x_trn_std, y_trn)                   # do the training
+    knn = KNeighborsClassifier(n_neighbors=neighs, p=2, metric='minkowski') # create the classifier
+    knn.fit(x_trn_std, y_trn)                   # training the model
 
-    y_pred = knn.predict(x_tst_std)             # now try with the test data
+    y_pred = knn.predict(x_tst_std)             # try to predict with the test data
     test_acc = accuracy_score(y_tst, y_pred)
 
     # combine the train and test data
@@ -168,26 +191,24 @@ def main():
     X = numpy_df[:,:FEATURES_END]               # separate all the features
     y = numpy_df[:, FEATURES_END].ravel()       # extract the classifications
 
-    # split the problem into train and test: 70% training and 30% test
-    # random_state allows the split to be reproduced
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=0)
+    # split the problem into test & train dataset- 70%-train & 30%-test
+    X_train, X_test, y_train, y_test = train_test_split( # 70% training and 30% test
+        X, y, test_size=0.3, random_state=0) # random_state allows the split to be reproduced
 
     # mean and standard deviation may be overridden with options
-    sc = StandardScaler()                       # create the standard scalar
-    sc.fit(X_train)                             # compute the required transformation
-    X_train_std = sc.transform(X_train)         # apply to the training data
-    X_test_std = sc.transform(X_test)           # and SAME transformation of test data
+    sc = StandardScaler()                       
+    sc.fit(X_train)                            
+    X_train_std = sc.transform(X_train)         
+    X_test_std = sc.transform(X_test)     #apply standardisation to the test and train data
     
     
     print('\n\n ############ perceptron ############')
     perceptron(X_train_std, X_test_std, y_train, y_test, PRCPTRN_MAX_ITERATIONS)
 
-    LR_C_VAL = .25
+    
     print('\n\n ############ logistic regression ############')
     logistic_regression(X_train_std, X_test_std, y_train, y_test, LR_C_VAL)
-    
-    SVM_C_VAL = .25 
+ 
     print('\n\n ############ support vector machine ############')
     support_vector_machine(X_train_std, X_test_std, y_train, y_test, SVM_C_VAL)
 
@@ -195,12 +216,10 @@ def main():
     print('\n\n ########## decision tree ############')
     decision_tree(X_train, X_test, y_train, y_test, TREE_DEPTH, 
     df.columns.values[FEATURES_START:FEATURES_END])
-
-    RF_TREES = 5  
+ 
     print('\n\n ########## random forest ############')
     random_forest(X_train, X_test, y_train, y_test, RF_TREES)
 
-    KNN_NEIGHBORS = 5
     print('\n\n ########## k-nearest neighbors ##########')
     k_nearest(X_train, X_test, y_train, y_test, KNN_NEIGHBORS)
 
