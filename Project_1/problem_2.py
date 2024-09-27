@@ -1,9 +1,11 @@
 import numpy as np                                      
 import pandas as pd
+from sklearn.svm import SVC  
 from sklearn.tree import export_graphviz
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import Perceptron
 from sklearn.preprocessing import StandardScaler
+
 from sklearn.tree import DecisionTreeClassifier                                      
 from sklearn.model_selection import train_test_split
 
@@ -14,7 +16,7 @@ TREE_DEPTH = 5
 PRCPTRN_MAX_ITERATIONS = 7 
 
 def print_results(test_sam, test_miss, test_acc, combined_sam, combined_miss, combined_acc):
-    print('\nNumber in test: ', test_sam)
+    print('Number in test: ', test_sam)
     print('Misclassified samples: %d' % test_miss)
     print('Accuracy: %.2f' % test_acc)
     print('Number in combined: ', combined_sam)
@@ -42,6 +44,27 @@ def perceptron(x_trn_std, x_tst_std, y_trn, y_tst, iterations):
     # print analysis result
     print_results(len(y_tst), (y_tst != y_pred).sum(), test_acc, 
                   len(y_combined), combined_samples, combined_acc)
+
+def support_vector_machine(x_trn_std, x_tst_std, y_trn, y_tst, c_val):
+    # create the classifier
+    svm = SVC(kernel='linear', C=c_val, random_state=0)
+    svm.fit(x_trn_std, y_trn)                   # do the training
+
+    y_pred = svm.predict(x_tst_std)             # now try with the test data
+    test_acc = accuracy_score(y_tst, y_pred)
+
+    # combine the train and test data
+    X_combined_std = np.vstack((x_trn_std, x_tst_std))
+    y_combined = np.hstack((y_trn, y_tst))
+
+    # we did the stack so we can see how the combination of test and train data did
+    y_combined_pred = svm.predict(X_combined_std)
+    combined_samples = (y_combined != y_combined_pred).sum()
+    combined_acc = accuracy_score(y_combined, y_combined_pred)
+
+    # print analysis result
+    print_results(len(y_tst), (y_tst != y_pred).sum(
+    ), test_acc, len(y_combined), combined_samples, combined_acc)
 
 def decision_tree(x_trn, x_tst, y_trn, y_tst, depth, cols):
     # create the classifier
@@ -95,9 +118,9 @@ def main():
     #print('logistic regression')
     #logistic_regression(X_train_std, X_test_std, y_train, y_test, LR_C_VAL)
     
-    # SVM_C_VAL = .25 
-    # print('support vector machine')
-    # support_vector_machine(X_train_std, X_test_std, y_train, y_test, SVM_C_VAL)
+    SVM_C_VAL = .25 
+    print('\n\n ############ support vector machine ############')
+    support_vector_machine(X_train_std, X_test_std, y_train, y_test, SVM_C_VAL)
 
     
     print('\n\n ########## decision tree ############')
