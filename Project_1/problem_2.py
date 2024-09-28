@@ -1,3 +1,10 @@
+############# Author Info ###################################
+# Adityaraj Suresh
+# EEE 591
+# Project1- Problem 2
+# asures56@asu.edu
+#############################################################
+
 import numpy as np                                      
 import pandas as pd
 from sklearn.svm import SVC  
@@ -191,7 +198,7 @@ def main():
     X = numpy_df[:,:FEATURES_END]               # separate all the features
     y = numpy_df[:, FEATURES_END].ravel()       # extract the classifications
 
-    # split the problem into test & train dataset- 70%-train & 30%-test
+    # split the problem into test & train dataset
     X_train, X_test, y_train, y_test = train_test_split( # 70% training and 30% test
         X, y, test_size=0.3, random_state=0) # random_state allows the split to be reproduced
 
